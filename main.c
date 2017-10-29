@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "cleanerlib.h"
 
 int main(int argc, char** argv)
 {
@@ -30,17 +29,12 @@ int main(int argc, char** argv)
         // täällä kutsutaan kirjastoa aina yhdellä parametrilla, käytetään exec
         if(pid == 0)
         {
-            printf("Calling cleaner with filename : %s\n", argv[i]);
+            printf("Calling cleaner with filename: %s\n", argv[i]);
 
-            remove_comments(argv[i]);
-            indent_code(argv[i], "  ");
+            char* args[] = {"./cleaner", argv[i], NULL};
 
-            char* delName = calloc(strlen(argv[i]) + 5, 1);
-            strcpy(delName, argv[i]);
-            strcat(delName, ".rem");
-
-            remove(delName);
-
+            execvp(args[0], args);
+            
             return 0;
         }
     }

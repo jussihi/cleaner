@@ -23,12 +23,12 @@ void indent_code(const char* filename, const char *pad)
 
     char* outName = calloc(strlen(filename) + 7, 1);
 
-    free(outName);
-
     strcpy(outName, filename);
     strcat(outName, ".clean");
 
     FILE* outFile = fopen(outName, "w");
+
+    free(outName);
 
     // read failed
     if(!outFile)

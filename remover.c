@@ -79,6 +79,7 @@ int remove_comments(const char* filename)
                 if (inchar == '*' && nextchar == '/')
                 {
                     rs = CODE;
+                    nextchar = fgetc(inFile);
                 }
                 break;
             }
