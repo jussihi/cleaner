@@ -1,20 +1,26 @@
 CC=gcc
-CFLAGS=-Wall -pedantic -std=c99 -g
+CFLAGS=-Wall -pedantic -std=c99 -g -D_POSIX_C_SOURCE
 LIB=ar rcs
 
 all: main cleaner
 
-main: main.c
-	$(CC) $(CFLAGS) -o main main.c
+main: main.c libheaphandler.a hhlib.h
+	$(CC) $(CFLAGS) -o main main.c -L. -lheaphandler
 
-cleaner: cleaner.c libcleanerlib.a cleanerlib.h
-	$(CC) $(CFLAGS) -o cleaner cleaner.c -L. -lcleanerlib
+cleaner: cleaner.c libcleanerlib.a libheaphandler.a hhlib.h cleanerlib.h
+	$(CC) $(CFLAGS) -o cleaner cleaner.c -L. -lcleanerlib -lheaphandler
 
 indent.o: indent.c
-	$(CC) $(CFLAGS) -c indent.c
+	$(CC) $(CFLAGS) -c indent.c -lheaphandler
 
-remover.o: remover.c
-	$(CC) $(CFLAGS) -c remover.c
+hhlib.o: hhlib.c
+	$(CC) $(CFLAGS) -c hhlib.c
+
+remover.o: remover.c hhlib.c
+	$(CC) $(CFLAGS) -c remover.c -lheaphandler
+
+libheaphandler.a: hhlib.o
+	$(LIB) libheaphandler.a hhlib.o && rm -f hhlib.o
 
 libcleanerlib.a: indent.o remover.o
 	$(LIB) libcleanerlib.a indent.o remover.o && rm -f indent.o remover.o

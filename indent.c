@@ -2,17 +2,18 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include "hhlib.h"
 
 void indent_code(const char* filename, const char *pad)
 {
-    char* inName = calloc(strlen(filename) + 5, 1);
+    char* inName = hhcalloc(strlen(filename) + 5, 1);
 
     strcpy(inName, filename);
     strcat(inName, ".rem");
 
-    FILE* inFile  = fopen(inName, "r");
+    FILE* inFile  = hhfopen(inName, "r");
 
-    free(inName);
+    hhfree(inName);
 
     // read failed
     if(!inFile)
@@ -21,14 +22,14 @@ void indent_code(const char* filename, const char *pad)
         return;
     }
 
-    char* outName = calloc(strlen(filename) + 7, 1);
+    char* outName = hhcalloc(strlen(filename) + 7, 1);
 
     strcpy(outName, filename);
     strcat(outName, ".clean");
 
-    FILE* outFile = fopen(outName, "w");
-
-    free(outName);
+    FILE* outFile = hhfopen(outName, "w");
+    
+    hhfree(outName);
 
     // read failed
     if(!outFile)
@@ -86,8 +87,8 @@ void indent_code(const char* filename, const char *pad)
     }
 
     // close file pointers
-    fclose(inFile);
-    fclose(outFile);
+    hhfclose(inFile);
+    hhfclose(outFile);
 
     return;
 }

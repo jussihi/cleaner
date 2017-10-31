@@ -1,11 +1,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
+#include "hhlib.h"
+// #include "hhlibglobal.h"
 
 int remove_comments(const char* filename)
 {
-
-    FILE* inFile  = fopen(filename, "r");
+    FILE* inFile  = hhfopen(filename, "r");
 
     // read failed
     if(!inFile)
@@ -14,14 +16,14 @@ int remove_comments(const char* filename)
         return -1;
     }
 
-    char* outName = calloc(strlen(filename) + 5, 1);
+    char* outName = hhcalloc(strlen(filename) + 5, 1);
 
     strcpy(outName, filename);
     strcat(outName, ".rem");
 
-    FILE* outFile = fopen(outName, "w");
+    FILE* outFile = hhfopen(outName, "w");
 
-    free(outName);
+    hhfree(outName);
 
     // read failed
     if(!outFile)
@@ -94,8 +96,8 @@ int remove_comments(const char* filename)
     }
 
     // close file pointers
-    fclose(inFile);
-    fclose(outFile);
+    hhfclose(inFile);
+    hhfclose(outFile);
 
     return 0;
 }
