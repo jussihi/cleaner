@@ -57,6 +57,7 @@ void hhfree(void* ptr)
 			{
 				free(ptr);
 				free(heap_handler.hpArr);
+				heap_handler.hpArr = NULL;
 				heap_handler.hpNum = 0;
 			}
 			else
@@ -83,6 +84,7 @@ void hhrelease()
 			free(heap_handler.hpArr[i]);
 		}
 		free(heap_handler.hpArr);
+		heap_handler.hpArr = NULL;
 		heap_handler.hpNum = 0;
 	}
 
@@ -95,6 +97,7 @@ void hhrelease()
 			fclose(heap_handler.fpArr[i]);
 		}
 		free(heap_handler.fpArr);
+		heap_handler.fpArr = NULL;
 		heap_handler.fpNum = 0;
 	}
 
@@ -107,6 +110,7 @@ void hhrelease()
 			close(heap_handler.fdArr[i]);
 		}
 		free(heap_handler.fdArr);
+		heap_handler.fdArr = NULL;
 		heap_handler.fdNum = 0;
 	}
 }
@@ -132,10 +136,20 @@ void hhclose(int fd)
 	{
 		if(heap_handler.fdArr[i] == fd)
 		{
-			close(fd);
-			heap_handler.fdArr[i] = heap_handler.fdArr[heap_handler.fdNum - 1];
-			heap_handler.fdArr = realloc(heap_handler.fdArr, (heap_handler.fdNum - 1) * sizeof(int));
-			heap_handler.fdNum--;
+			if(heap_handler.fdNum == 1)
+			{
+				close(fd);
+				free(heap_handler.fdArr);
+				heap_handler.fdArr = NULL;
+				heap_handler.fdNum = 0;
+			}
+			else
+			{
+				close(fd);
+				heap_handler.fdArr[i] = heap_handler.fdArr[heap_handler.fdNum - 1];
+				heap_handler.fdArr = realloc(heap_handler.fdArr, (heap_handler.fdNum - 1) * sizeof(int));
+				heap_handler.fdNum--;
+			}
 			return;
 		}
 	}
@@ -177,6 +191,7 @@ void hhfclose(FILE* stream)
 			{
 				fclose(stream);
 				free(heap_handler.fpArr);
+				heap_handler.fpArr = NULL;
 				heap_handler.fpNum = 0;
 			}
 			// standard case

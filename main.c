@@ -66,6 +66,7 @@ int main(int argc, char** argv)
     sigemptyset(&sa.sa_mask);
 
     sa.sa_handler = &sig_int;
+    sa.sa_flags = 0;
 
     // the sig_int only handles these 2 signals
     sigaction(SIGINT, &sa, NULL);

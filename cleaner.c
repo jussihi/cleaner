@@ -38,6 +38,7 @@ int main(int argc, char** argv)
     sigemptyset(&sa.sa_mask);
 
     sa.sa_handler = &sig_term;
+    sa.sa_flags = 0;
 
     // the sig_term only handles SIGTERM and SIGINT
     sigaction(SIGTERM, &sa, NULL);

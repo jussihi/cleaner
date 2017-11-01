@@ -46,6 +46,10 @@ int remove_comments(const char* filename)
     while (inchar != EOF)
     {
         nextchar = fgetc(inFile);
+        while(inchar == '\n' && nextchar == '\n')
+        {
+            nextchar = fgetc(inFile);
+        }
         switch(rs)
         {
             case CODE:
