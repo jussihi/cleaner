@@ -5,7 +5,6 @@
 #include <fcntl.h> // open
 #include <unistd.h> // close
 #include "hhlib.h"
-// #include "hhlibglobal.h"
 
 hhStruct heap_handler = {NULL, NULL, NULL, 0, 0, 0};
 
@@ -143,9 +142,6 @@ void hhclose(int fd)
 	return;
 }
 
-/*
- * This is also an ugly implementation of file pointer interface
- */
 
 FILE* hhfopen(const char* pathname, const char* mode)
 {
@@ -183,6 +179,7 @@ void hhfclose(FILE* stream)
 				free(heap_handler.fpArr);
 				heap_handler.fpNum = 0;
 			}
+			// standard case
 			else
 			{
 				fclose(stream);

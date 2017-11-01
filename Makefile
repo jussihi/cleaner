@@ -4,11 +4,11 @@ LIB=ar rcs
 
 all: main cleaner
 
-main: main.c libheaphandler.a hhlib.h
-	$(CC) $(CFLAGS) -o main main.c -L. -lheaphandler
+main: main.c libheaphandler.a hhlib.h log.h
+	$(CC) $(CFLAGS) -o main main.c log.c -L. -lheaphandler
 
-cleaner: cleaner.c libcleanerlib.a libheaphandler.a hhlib.h cleanerlib.h
-	$(CC) $(CFLAGS) -o cleaner cleaner.c -L. -lcleanerlib -lheaphandler
+cleaner: cleaner.c libcleanerlib.a libheaphandler.a hhlib.h cleanerlib.h log.h
+	$(CC) $(CFLAGS) -o cleaner cleaner.c log.c -L. -lcleanerlib -lheaphandler
 
 indent.o: indent.c
 	$(CC) $(CFLAGS) -c indent.c -lheaphandler
@@ -26,4 +26,4 @@ libcleanerlib.a: indent.o remover.o
 	$(LIB) libcleanerlib.a indent.o remover.o && rm -f indent.o remover.o
 
 clean:
-	rm -f main cleaner *.o *.a
+	rm -f main cleaner *.o *.a *.log *.clean

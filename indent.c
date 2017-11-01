@@ -4,7 +4,7 @@
 #include <ctype.h>
 #include "hhlib.h"
 
-void indent_code(const char* filename, const char *pad)
+int indent_code(const char* filename, const char *pad)
 {
     char* inName = hhcalloc(strlen(filename) + 5, 1);
 
@@ -18,8 +18,7 @@ void indent_code(const char* filename, const char *pad)
     // read failed
     if(!inFile)
     {
-        printf("opening failed\n");
-        return;
+        return -1;
     }
 
     char* outName = hhcalloc(strlen(filename) + 7, 1);
@@ -34,8 +33,7 @@ void indent_code(const char* filename, const char *pad)
     // read failed
     if(!outFile)
     {
-        printf("write open failed\n");
-        return;
+        return -2;
     }
     
     int curtabs = 0;
@@ -86,9 +84,15 @@ void indent_code(const char* filename, const char *pad)
         }
     }
 
+    if(ferror(inFile) || ferror(outFile))
+    {
+        perror("ferror: Error occured\n");
+        return -3;
+    }
+
     // close file pointers
     hhfclose(inFile);
     hhfclose(outFile);
 
-    return;
+    return 0;
 }

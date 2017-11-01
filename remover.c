@@ -3,7 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "hhlib.h"
-// #include "hhlibglobal.h"
+
 
 int remove_comments(const char* filename)
 {
@@ -12,7 +12,6 @@ int remove_comments(const char* filename)
     // read failed
     if(!inFile)
     {
-        printf("opening failed\n");
         return -1;
     }
 
@@ -28,8 +27,7 @@ int remove_comments(const char* filename)
     // read failed
     if(!outFile)
     {
-        printf("write open failed\n");
-        return -1;
+        return -2;
     }
 
     typedef enum
@@ -92,7 +90,7 @@ int remove_comments(const char* filename)
     if(ferror(inFile))
     {
         perror("ferror: Error occured\n");
-        return -1;
+        return -3;
     }
 
     // close file pointers

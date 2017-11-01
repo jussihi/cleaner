@@ -2,19 +2,23 @@
  * Function definitions of the cleanerlib library
  */ 
 
+#ifndef HH_CLEANER_C
+#define HH_CLEANER_C
 
 /*
  * Function indent_code
  * @param filename - The filename of the original code file
  * @param pad - The padding user wants to apply, for example "  " (two spaces)
- * @reuturn void - returns nothing
+ * @reuturn int - This function returns a negative integer if an error occured.
  */
-void indent_code(const char* filename, const char *pad);
+int indent_code(const char* filename, const char *pad);
 
 /*
  * Function remove_comments
  * @param filename - The filename of the original code file
- * @return int - 	 The amount of comments removed. This function 
- * 					 returns a negative integer if an error occured.
+ * @return int - This function returns a negative integer if an error occured.
  */
 int remove_comments(const char* filename);
+
+
+#endif

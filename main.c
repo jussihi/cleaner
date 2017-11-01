@@ -5,37 +5,46 @@
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <time.h>
 #include "hhlib.h"
+#include "log.h"
 
-static int childs;
+static int log_fd;
 
 void sig_int(int signal)
 {
-    printf("moi\n");
     switch(signal)
     {
+        // only handle SIGINT
         case SIGINT:
         {
-            printf("moi");
-            pid_t p;
-
+            printf("Process exit due to user exit (ctrl + c)\n");
+            log_write(log_fd, 1, "Caught SIGINT, killing children and returning.");
             int status;
-
+            // send SIGTERM to every child process with same group ID
             kill(0, SIGTERM);
-
+            // give time to exit gracefully
             sleep(1);
 
+            // this is buggy, only gets one child's status, how to fix?
+            pid_t p;
             p = waitpid(-1, &status, WNOHANG);
             if(!WIFEXITED(status))
             {
+                // if the child(s) didn't exit gracefully, send SIGKILL
+                log_write(log_fd, 1, "Every child process did not exit gracefully. Trying SIGKILL.");
                 printf("p: %d\n", p);
                 while((p = waitpid(-1, NULL, WNOHANG)) != -1)
                 {
                     kill(p, SIGKILL);
                 }
             }
+            log_write(log_fd, 1, "Every child terminated. Exiting.");
             exit(0);
         }
+        // this is because this pid will also get the SIGTERM
         default:
             break;
     }
@@ -44,29 +53,35 @@ void sig_int(int signal)
 
 int main(int argc, char** argv)
 {
-    childs = argc-1;
+    // remove old log and create a new one
+
+    remove("cleaner.log");
+
+    log_fd = open("cleaner.log", O_RDWR | O_APPEND | O_CREAT | O_NONBLOCK, S_IRWXU);
+
+    log_write(log_fd, 1, "Main program init.");
+
     struct sigaction sa;
 
     sigemptyset(&sa.sa_mask);
 
     sa.sa_handler = &sig_int;
 
+    // the sig_int only handles these 2 signals
     sigaction(SIGINT, &sa, NULL);
     sigaction(SIGTERM, &sa, NULL);
 
-    printf("parent pid: %d\n", getpid());
+    // chech that the program was opened appropriately
     if(argc == 1)
     {
         printf("usage: %s filename1 filename 2 ...\n", argv[0]);
+        log_write(log_fd, 1, "The main program was run without any parameters. Exiting.");
         return -1;
     }
 
-    // joku kirjasto jolle annetaan tasan 1 argumentti,
-    // tällöin kyseistä voidaan kutsua execillä monta kertaa
-
-
     pid_t pid;
 
+    // fork childs, exec one program with each child
     for(int i = 1; i < argc; i++)
     {
         pid = fork();
@@ -75,10 +90,10 @@ int main(int argc, char** argv)
             perror("Fork failed!\n");
             return -1;
         }
-        // täällä kutsutaan kirjastoa aina yhdellä parametrilla, käytetään exec
+        // if child, exec another program (cleaner)
         if(pid == 0)
         {
-            printf("Calling cleaner with filename: %s\n", argv[i]);
+            log_write(log_fd, 2, "Opening a new cleaner instance with filename: ", argv[i]);
 
             char* args[] = {"./cleaner", argv[i], NULL};
 
@@ -87,8 +102,8 @@ int main(int argc, char** argv)
             return 0;
         }
     }
-    sleep(20);
-    // onko parempi näin vai ylemmän for-loopin sisään elsenä????
+    //sleep(20);
+    // Wait for children to return before exiting the parent program
     for(int i = 1; i < argc; i++)
     {
         if(pid != 0)
@@ -99,7 +114,7 @@ int main(int argc, char** argv)
             }
         }
     }
-	printf("Every cleaner returned\n");
+	log_write(log_fd, 1, "Every cleaner returned. Exiting main program.");
 
 	return 0;
 }
